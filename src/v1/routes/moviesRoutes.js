@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const {list,detail,create,update,destroy} = require('../../controllers/moviesController');
+const {list,detail,store,update,destroy} = require('../../controllers/moviesController');
+const moviesValidation = require('../../validaciones/moviesValidation');
 
 
 
@@ -8,7 +9,7 @@ router.get('/',list);
 
 
 router.get('/:id', detail);
-router.post('/',create);
+router.post('/',moviesValidation,store);
 router.put('/:id', update);
 router.delete('/:id',destroy)
 

@@ -23,7 +23,7 @@ module.exports = (sequelize, dataTypes) => {
         },
         release_date: {
             type: dataTypes.DATEONLY,
-            allowNull: false
+            allowNull: true
         },
         length: dataTypes.BIGINT(10),
         genre_id: dataTypes.BIGINT(10)

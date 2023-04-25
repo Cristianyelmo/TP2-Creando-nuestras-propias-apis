@@ -3,8 +3,10 @@ const db = require('../database/models');
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
 const moment = require('moment');
+const createResponseError = require('../helpers/createResponseError');
+const { getAllmovies,createMovies,MoviesUpdate, MoviesDelete} = require('../services/moviesServices');
 
-
+const{validationResult} = require('express-validator')
 //Aqui tienen otra forma de llamar a cada uno de los modelos
 const Movies = db.Movie;
 const Genres = db.Genre;
@@ -12,7 +14,7 @@ const Actors = db.Actor;
 
 
 const moviesController = {
-    'list': (req, res) => {
+    /* 'list': (req, res) => {
         db.Movie.findAll({
             include: ['genre']
         })
@@ -77,7 +79,193 @@ const moviesController = {
         .then(()=>{
             return res.redirect('/movies')})
         .catch(error => res.send(error)) 
-    }
+    } */
+    list : async (req, res) => {
+
+        try {
+            
+          const genres = await  getAllmovies()
+          
+        
+            return res.status(200).json({
+        ok:true,
+        meta:{
+            
+            status:200,
+            
+            total:genres.length},
+        data:genres,
+        url:'/api/genres'
+        
+            })
+        
+        
+        
+        } catch (error) {
+        
+        
+        return  createResponseError(res,error)
+        
+            
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            },
+        detail: async(req, res) => {
+        
+        try {
+        
+            const{
+                params:{id}
+            } = req
+        
+          
+            const genre = await  getOnegenres(id)
+        
+             return res.status(200).json({
+           
+        ok:true,
+        meta:{
+            
+            status:200,
+            
+            total:1,
+            url:`/api/genres/${id}`},
+        data:genre,
+        
+            })
+        
+        
+                   
+            
+        } catch (error) {
+        
+            
+            return  createResponseError(res,error)
+            
+        }
+        
+        
+        
+                
+            },
+
+            store:async(req,res)=>{
+        
+        
+        
+        try {
+            const errors = validationResult(req)
+        
+          
+          
+        
+          
+          if(!errors.isEmpty()) throw{
+            status:400,
+            message:errors.mapped()
+          }
+        
+        
+        
+        
+            const newGenre = await createMovies(req.body)
+           
+        
+            return res.status(200).json({
+                ok:true,
+                meta:{
+                    
+                    status:200,
+                    
+                    total:1},
+                data:newGenre,
+                url:`/api/genres/${newGenre.id}`
+                
+                    })
+            
+        } catch (error) {
+            return  createResponseError(res,error)
+        }
+        
+        
+            },
+        
+            update:async(req,res)=>{
+                try {
+        
+                    const{
+                        params:{id}
+                    } = req
+                
+                  
+                    const moviesupdate = await  MoviesUpdate(req.body,id)
+                
+                     return res.status(200).json({
+                   
+                ok:true,
+                meta:{
+                    
+                    status:200,
+                    
+                    total:1,
+                    url:`/api/genres/${id}`},
+                data:moviesupdate,
+                
+                    })
+                
+                
+                           
+                    
+                } catch (error) {
+                
+                    
+                    return  createResponseError(res,error)
+                    
+                }
+            },
+            destroy: async(req, res) => {
+        
+                try {
+                
+                    const{
+                        params:{id}
+                    } = req
+                
+                  
+                    const movies = await  MoviesDelete(id)
+                
+                     return res.status(200).json({
+                   
+                message:`se ha borrado el producto con el id ${id}`
+                
+                    })
+                
+                
+                           
+                    
+                } catch (error) {
+                
+                    
+                    return  createResponseError(res,error)
+                    
+                }
+                
+                
+                
+                        
+                    },
+
+
+
+
 }
 
 module.exports = moviesController;
